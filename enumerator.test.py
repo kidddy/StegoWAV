@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import unittest
-from chunkHandlers import Enumerator
+from enumerator import Enumerator
 
 
 a = [i for i in range(20)]

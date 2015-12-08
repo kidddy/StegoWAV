@@ -1,6 +1,6 @@
 #!\usr\bin\python3
 
-from bitIterator import BitIter
+import byte_tools
 from .chunkHandlers import CHUNK_HANDLERS
 
 
@@ -14,7 +14,7 @@ class WavFile:
         with open(self._name, mode='rb') as f:
             if f.read(4).decode('utf-8') != 'RIFF':
                 raise Exception("Bad file: not RIFF")
-            size = BitIter.bytesToIntLE(f.read(4))
+            size = byte_tools.bytesToIntLE(f.read(4))
             if f.read(4).decode('utf-8') != 'WAVE':
                 raise Exception("Bad file: not WAVE")
             self._read_chunks(f, size - 4)
@@ -23,7 +23,7 @@ class WavFile:
         pos = 0
         while pos != size:
             chunkName = f.read(4).decode('utf-8')
-            chunkSize = BitIter.bytesToIntLE(f.read(4))
+            chunkSize = byte_tools.bytesToIntLE(f.read(4))
             if (chunkName not in CHUNK_HANDLERS) or (chunkSize == 0):
                 self.undecodedData['Size'] = size - pos
                 self.undecodedData['Data'] = f.read(size - pos)
@@ -50,34 +50,12 @@ class WavFile:
     def saveToDisk(self, name):
         with open(name, 'wb') as f:
             f.write(b'RIFF')
-            f.write(BitIter.intToBytesLE(self.get_size() - 8, 4))
+            f.write(byte_tools.intToBytesLE(self.get_size() - 8, 4))
             f.write(b'WAVE')
             f.write(self.chunks['fmt '].toBytes())
             f.write(self.chunks['fact'].toBytes())
             f.write(self.chunks['data'].toBytes())
 
-    def samples(self):
-        size = self.chunks['data'].get_size()
-        pos = 0
-        blockAlign = self.chunks['fmt '].blockAlign
-        numChannels = self.chunks['fmt '].numChannels
-        bytePerSample = self.chunks['fmt '].bitsPerSample // 8
-        while pos != size:
-            result = []
-            for _ in range(numChannels):
-                result.append(bytes(self.chunks['data'].data.read(bytePerSample)))
-            yield result
-            pos += blockAlign
-
-    def set_data(self, data):
-        self.chunks['data'] = CHUNK_HANDLERS['data'](data)
-
-    def container_space(self):
-        return (
-            self.chunks['data'].get_size() //
-            self.chunks['fmt '].blockAlign *
-            self.chunks['fmt '].numChannels // 8
-            )   
 
 def main():
     pass

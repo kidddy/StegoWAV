@@ -1,43 +1,12 @@
 #!/usr/bin/python3
 
-from bitIterator import BitIter
+import byte_tools
+from enumerator import Enumerator
 
 def toInt(b):
-    return BitIter.bytesToIntLE(bytes(b))
+    return byte_tools.bytesToIntLE(bytes(b))
 
-toBytes = BitIter.intToBytesLE
-
-
-class Enumerator:
-    def __init__(self, sequence):
-        self._body = sequence
-        self._iter = iter(self._body)
-        self._pos = 0
-
-    def seek(self, position):
-        self._pos = position
-        self._iter = iter(self._body)
-        step = 0
-        while step != self._pos:
-            next(self._iter)
-            step += 1
-
-    def get_size(self):
-        return len(self._body)
-
-    def tell(self):
-        return self._pos
-
-    def read(self, num=-1):
-        if num == -1:
-            num = self.get_size() - self._pos
-        step = 0
-        result = []
-        while step != num:
-            result.append(next(self._iter))
-            step += 1
-        self._pos += num
-        return result
+toBytes = byte_tools.intToBytesLE
 
 
 
@@ -87,6 +56,19 @@ class ChunkFMT:
         result += toBytes(self.bitsPerSample, 2)
         return result
         #TODO Extra data doesn't write
+
+    def __eq__(self, other):
+        if not isinstance(other, ChunkFMT):
+            return False
+        return (
+            self.format == other.format and
+            self.numChannels == other.numChannels and
+            self.sampleRate == other.sampleRate and
+            self.byteRate == other.byteRate and
+            self.blockAlign == other.blockAlign and
+            self.bitsPerSample == other.bitsPerSample and
+            self.extraData == other.extraData
+        )
 
 
 class ChunkDATA:

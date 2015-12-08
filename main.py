@@ -2,8 +2,6 @@
 
 from WavContainer.wavEditor import WavFile
 import sys
-from os.path import getsize
-from bitIterator import BitIter
 
 
 def main():
