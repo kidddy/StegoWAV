@@ -86,7 +86,7 @@ class ChunkFMT(AbstractChunk):
 
 class ChunkDATA(AbstractChunk):
     def __init__(self, data):
-        self.data = Enumerator(data)
+        self.data = bytearray(data)
 
     def get_size(self):
         return self.data.get_size()
