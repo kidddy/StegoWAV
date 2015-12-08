@@ -2,9 +2,10 @@
 
 import byte_tools
 from .chunkHandlers import CHUNK_HANDLERS
+from abstracts import AbstractFile
 
 
-class WavFile:
+class WavFile(AbstractFile):
     def __init__(self, filename):
         self._name = filename
         self.chunks = {}

@@ -1,21 +1,15 @@
 #!/usr/bin/python3
 
-from WavContainer.wavEditor import WavFile
+from WavContainer.wavFile import WavFile
+from WavContainer.wavContainer import WavContainer
 import sys
 
 
 def main():
-    w = WavFile(sys.argv[1])
+    w = WavContainer(sys.argv[1])
     w.print_info()
-    # s = []
-    # for e in w.samples():
-    #     s.append(e)
-    # data = b''
-    # for sample in reversed(s):
-    #     for b in sample:
-    #         data += bytes(b)
-    # w.set_data(data)
-    w.saveToDisk('output.wav')
+    # w.saveToDisk('output.wav')
+    print(w.container_space())
 
 
 

@@ -9,8 +9,21 @@ def toInt(b):
 toBytes = byte_tools.intToBytesLE
 
 
+class AbstractChunk:
+    def __init__(self, data):
+        raise NotImplementedError("Need to rewrite method")
 
-class ChunkFMT:
+    def get_size(self):
+        raise NotImplementedError("Need to rewrite method")
+
+    def print_info(self):
+        raise NotImplementedError("Need to rewrite method")
+
+    def toBytes(self):
+        raise NotImplementedError("Need to rewrite method")
+
+
+class ChunkFMT(AbstractChunk):
     def __init__(self, data):
         f = Enumerator(data)
         self.format = toInt(f.read(2))
@@ -71,7 +84,7 @@ class ChunkFMT:
         )
 
 
-class ChunkDATA:
+class ChunkDATA(AbstractChunk):
     def __init__(self, data):
         self.data = Enumerator(data)
 
@@ -92,7 +105,7 @@ class ChunkDATA:
 
 
 
-class ChunkFACT:
+class ChunkFACT(AbstractChunk):
     def __init__(self, data):
         self._data = data
 
