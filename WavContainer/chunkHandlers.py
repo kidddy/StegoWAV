@@ -89,7 +89,7 @@ class ChunkDATA(AbstractChunk):
         self.data = bytearray(data)
 
     def get_size(self):
-        return self.data.get_size()
+        return len(self.data)
 
     def print_info(self):
         print('Chunk ID: "data"')
@@ -99,7 +99,7 @@ class ChunkDATA(AbstractChunk):
         result = b''
         result += b'data'
         result += toBytes(self.get_size(), 4)
-        result += bytes(self.data.read())
+        result += bytes(self.data)
         return result
 
 

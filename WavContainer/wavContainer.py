@@ -26,23 +26,25 @@ class WavContainer(AbstractContainer, WavFile):
 
 
     def hide(self, bytes_data):
+        if len(bytes_data) > self.container_space():
+            raise Exception("Too much data to hide.")
         step = self.chunks['fmt '].bitsPerSample // 8
-        pos = -1
+        pos = -2
         for bit in byte_tools.toBits(bytes_data):
             pos += step
             self._set_byte_at_pos(
-                byte_tools.hideBit(self._byte_at_pos(pos), bit),
+                byte_tools.hideBit(self._byte_at_pos(pos), bit, 8),
                 pos
             )
 
     def reveal(self, num):
         result = []
         step = self.chunks['fmt '].bitsPerSample // 8
-        pos = -1
-        for i in range(num):
+        pos = -2
+        for i in range(num * 8):
             pos += step
             result.append(
-                byte_tools.toBits(self._set_byte_at_pos(pos))[7]
+                byte_tools.toBits(self._byte_at_pos(pos))[7]
             )
         return byte_tools.toBytes(result)
 

@@ -44,7 +44,7 @@ def hideBit(byte, hbit, position=8):
             continue
         result = result * 2 + bit
         step += 1
-    return bytes([result])
+    return result
 
 def bytesToInt(bytestr):
     result = 0

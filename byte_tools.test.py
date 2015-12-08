@@ -18,15 +18,15 @@ class byte_tools_Test(unittest.TestCase):
 
     def test_hideBit1(self):
         b = byte_tools.hideBit(b'\x00', 1)
-        self.assertEqual(b'\x01', b)
+        self.assertEqual(1, b)
 
     def test_hideBit2(self):
         b = byte_tools.hideBit(b'\x00', 0)
-        self.assertEqual(b'\x00', b)
+        self.assertEqual(0, b)
 
     def test_hideBit3(self):
         b = byte_tools.hideBit(b'\xfa', 1)
-        self.assertEqual(b'\xfb', b)
+        self.assertEqual(251, b)
 
     def test_bytesToInt(self):
         self.assertEqual(511, byte_tools.bytesToInt(b'\x01\xff'))
