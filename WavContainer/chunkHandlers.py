@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 
 import byte_tools
+from abc import ABCMeta, abstractmethod
 from enumerator import Enumerator
+
 
 def toInt(b):
     return byte_tools.bytesToIntLE(bytes(b))
@@ -9,17 +11,21 @@ def toInt(b):
 toBytes = byte_tools.intToBytesLE
 
 
-class AbstractChunk:
+class AbstractChunk(metaclass=ABCMeta):
+    @abstractmethod
     def __init__(self, data):
         raise NotImplementedError("Need to rewrite method")
 
+    @abstractmethod
     def get_size(self):
         raise NotImplementedError("Need to rewrite method")
 
+    @abstractmethod
     def print_info(self):
         raise NotImplementedError("Need to rewrite method")
 
-    def toBytes(self):
+    @abstractmethod
+    def to_bytes(self):
         raise NotImplementedError("Need to rewrite method")
 
 
@@ -57,7 +63,7 @@ class ChunkFMT(AbstractChunk):
         if self._hasExtra:
             print('    Extra data: {}'.format(self.extraData))
 
-    def toBytes(self):
+    def to_bytes(self):
         result = b''
         result += b'fmt '
         result += toBytes(self.get_size(), 4)
@@ -95,14 +101,12 @@ class ChunkDATA(AbstractChunk):
         print('Chunk ID: "data"')
         print('Size: {}'.format(self.get_size()))
 
-    def toBytes(self):
+    def to_bytes(self):
         result = b''
         result += b'data'
         result += toBytes(self.get_size(), 4)
         result += bytes(self.data)
         return result
-
-
 
 
 class ChunkFACT(AbstractChunk):
@@ -116,7 +120,7 @@ class ChunkFACT(AbstractChunk):
         print('Chunk ID: "fact"')
         print('Size: {}'.format(self.get_size()))
 
-    def toBytes(self):
+    def to_bytes(self):
         result = b''
         result += b'fact'
         result += toBytes(self.get_size(), 4)

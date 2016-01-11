@@ -1,39 +1,50 @@
 #!/usr/bin/python3
 
 
-class AbstractContainer:
-    """Should be inherited from AbstractFile"""
-    def __init__(self, filename):
-        raise NotImplementedError("Need to rewrite method.")
+from abc import ABCMeta, abstractmethod
 
+
+class AbstractContainer(metaclass=ABCMeta):
+    """Should be inherited from AbstractFile"""
+    @abstractmethod
+    def __init__(self, filename):
+        pass
+
+    @abstractmethod
     def container_space(self):
         """Returns number of bytes, which can be hide here."""
-        raise NotImplementedError("Need to rewrite method.")
+        pass
 
+    @abstractmethod
     def hide(self, bytes_data):
         """Hides data in himself."""
-        raise NotImplementedError("Need to rewrite method.")
+        pass
 
+    @abstractmethod
     def reveal(self, num):
         """Reveals 'num' of bytes."""
+        pass
 
 
-class AbstractFile:
+class AbstractFile(metaclass=ABCMeta):
+    @abstractmethod
     def __init__(self, filename):
-        raise NotImplementedError("Need to rewrite method.")
+        pass
 
+    @abstractmethod
     def get_size(self):
         """Returns a size of file."""
-        raise NotImplementedError("Need to rewrite method.")
+        pass
 
+    @abstractmethod
     def print_info(self):
         """Prints interior info of file."""
-        raise NotImplementedError("Need to rewrite method.")
+        pass
 
-    def saveToDisk(self, filename):
+    @abstractmethod
+    def save_to_disk(self, filename):
         """Writes self to disk"""
-        raise NotImplementedError("Need to rewrite method.")
-
+        pass
 
 
 def main():
