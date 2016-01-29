@@ -1,46 +1,85 @@
 #!/usr/bin/python3
 
 
-import sys
-import byte_tools
+from sys import argv
 from os.path import getsize
 
 
-def xxd(bytestr):
-    step = 0
-    line = ''
-    endian = ''
-    for byte in bytestr:
-        if byte in [_ for _ in range(32, 127)]:
-            endian += chr(byte)
-        else:
-            endian += '.'
-        byte = hex(byte)[2:]
-        if len(byte) < 2:
-            byte = '0' + byte
-        line += byte + " "
-        step += 1
-        if step % 4 == 0:
-            line += " "
-    while len(line) < 52:
-        line += ' '
-    return line + "  " + endian
+class Dumper:
+    """These objects will dumps input databytes in xxd format."""
+    def __init__(self, num_shift=5):
+        self._num_line = 0
+        self._shift = num_shift
 
-def getnum(num, size):
-    shift = size // 16 + 1
-    result = hex(num)[2:]
-    while len(result) != len(str(shift)):
-        result = "0" + result
-    return result
+    @property
+    def shift(self):
+        return self._shift
+
+    @shift.setter
+    def shift(self, value, errors="ignore"):
+        if not (errors == "ignore" or errors == "strict"):
+            raise ValueError("bad argument: errors.")
+        if value < -1 and errors == "strict":
+            raise ValueError("bad argument: value.")
+        self._shift = value
+
+    @staticmethod
+    def count_shift(buffer_size):
+        return len(str(buffer_size // 16 + 1))
+
+    @staticmethod
+    def file_iterator(f, size):
+        def result():
+            for _ in range(size):
+                yield f.read(1)
+        return result()
+
+    def _xxd(self, byte_sequence):
+        line = hex(self._num_line)[2:].rjust(self._shift, "0") + ":    "
+        num = 0
+        endian = ""
+        for byte in byte_sequence:
+            if not isinstance(byte, int):
+                if isinstance(byte, bytes):
+                    byte = byte[0]
+                else:
+                    raise Exception("Unexpected type: {}".format(type(byte)))
+            if 31 < byte < 127:
+                endian += chr(byte)
+            else:
+                endian += '.'
+            line += hex(byte)[2:].rjust(2, "0") + " "
+            num += 1
+            if num % 4 == 0:
+                line += " "
+            if num == 16:
+                yield line + " " + endian
+                self._num_line += 1
+                line = hex(self._num_line)[2:].rjust(self._shift, "0") + ":    "
+                num = 0
+                endian = ""
+        if num != 0:
+            line = line.ljust(57 + self._shift)
+            yield line + " " + endian
+
+    def __call__(self, *args, **kwargs):
+        try:
+            yield from self._xxd(*args, **kwargs)
+        except BrokenPipeError:
+            pass
+        except Exception as e:
+            print(str(e))
+
 
 def main():
-    filename = sys.argv[1]
-    num = 0
-    size = getsize(filename)
-    with open(filename, 'rb') as f:
-        while size - f.tell() != 0:
-            print('{}:     {}'.format(getnum(num, size), xxd(f.read(16))))
-            num += 1
+    file_name = argv[1]
+    size = getsize(file_name)
+    shift = Dumper.count_shift(size)
+    with open(file_name, mode='rb') as f:
+        i = Dumper.file_iterator(f, size)
+        xxd = Dumper(shift)
+        for line in xxd(i):
+            print(line)
 
 
 if __name__ == '__main__':
