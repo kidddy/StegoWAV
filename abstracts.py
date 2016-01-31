@@ -7,7 +7,7 @@ from abc import ABCMeta, abstractmethod
 class AbstractContainer(metaclass=ABCMeta):
     """Should be inherited from AbstractFile"""
     @abstractmethod
-    def __init__(self, filename):
+    def __init__(self, file_name):
         pass
 
     @abstractmethod
@@ -28,7 +28,7 @@ class AbstractContainer(metaclass=ABCMeta):
 
 class AbstractFile(metaclass=ABCMeta):
     @abstractmethod
-    def __init__(self, filename):
+    def __init__(self, file_name):
         pass
 
     @abstractmethod
@@ -42,7 +42,7 @@ class AbstractFile(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def save_to_disk(self, filename):
+    def save_to_disk(self, file_name):
         """Writes self to disk"""
         pass
 

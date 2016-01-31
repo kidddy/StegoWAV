@@ -4,10 +4,9 @@
 from WavContainer.wavContainer import WavContainer
 
 
-
 class Program:
 
-    mode = {}
+    mode = dict()
     mode['default'] = 0
     mode['--hide'] = 1
     mode['--reveal'] = 2
@@ -35,27 +34,27 @@ class Program:
     def _hide(self):
         if len(self._args) < 3:
             print("Arguments error.")
-        (inputfile, hidedata, outputfile) = self._args
-        with open(hidedata, 'rb') as f:
+        (input_file, hide_data, output_file) = self._args
+        with open(hide_data, 'rb') as f:
             data = f.read()
-        w = WavContainer(inputfile)
+        w = WavContainer(input_file)
         w.hide(data)
-        w.saveToDisk(outputfile)
+        w.save_to_disk(output_file)
         print("Done!")
 
     def _reveal(self):
         if len(self._args) < 3:
             print("Arguments error.")
-        (container, numBytes, outputfile) = self._args
+        (container, num_bytes, output_file) = self._args
         w = WavContainer(container)
-        data = w.reveal(int(numBytes))
-        with open(outputfile, 'wb') as f:
+        data = w.reveal(int(num_bytes))
+        with open(output_file, 'wb') as f:
             f.write(data)
         print("Done")
 
-    def print_help(self):
+    @staticmethod
+    def print_help():
         print("HELP INFO.")
-
 
 
 def main():

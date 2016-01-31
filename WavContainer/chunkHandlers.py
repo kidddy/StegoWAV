@@ -6,9 +6,9 @@ from enumerator import Enumerator
 
 
 def toInt(b):
-    return byte_tools.bytesToIntLE(bytes(b))
+    return byte_tools.bytes_to_int_le(bytes(b))
 
-toBytes = byte_tools.intToBytesLE
+toBytes = byte_tools.int_to_bytes_le
 
 
 class AbstractChunk(metaclass=ABCMeta):

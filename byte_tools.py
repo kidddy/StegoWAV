@@ -1,10 +1,9 @@
 #!/usr/bin/python3
-from os.path import getsize
 
 
-def toBits(bytestr):
+def to_bits(byte_str):
     result = []
-    for byte in bytestr:
+    for byte in byte_str:
         bits = bin(byte)[2:]
         for _ in range(8 - len(bits)):
             result.append(0)
@@ -12,7 +11,8 @@ def toBits(bytestr):
             result.append(int(bit))
     return result
 
-def toBytes(bits):
+
+def to_bytes(bits):
     b = []
     i = len(bits)
     while i % 8 != 0:
@@ -32,13 +32,14 @@ def toBytes(bits):
             count = 8
     return bytes(result)
 
-def hideBit(byte, hbit, position=8):
-    if (position < 1 and position > 8):
+
+def hide_bit(byte, hbit, position=8):
+    if not (0 < position < 9):
         raise Exception("Bad argument position. It should be in [1..8].")
     result = 0
     step = 1
-    for bit in toBits(byte):
-        if (step == position):
+    for bit in to_bits(byte):
+        if step == position:
             result = result * 2 + hbit
             step += 1
             continue
@@ -46,21 +47,24 @@ def hideBit(byte, hbit, position=8):
         step += 1
     return result
 
-def bytesToInt(bytestr):
+
+def bytes_to_int(byte_str):
     result = 0
-    for bit in toBits(bytestr):
+    for bit in to_bits(byte_str):
         result = result * 2 + bit
     return result
 
-def bytesToIntLE(bytestr):
-    return bytesToInt(reversed(bytestr))
 
-def intToBytes(num, count=0):
+def bytes_to_int_le(byte_str):
+    return bytes_to_int(reversed(byte_str))
+
+
+def int_to_bytes(num, count=0):
     n = bin(num)[2:]
     b = []
     for e in n:
         b.append(int(e))
-    result = toBytes(b)
+    result = to_bytes(b)
     if count == 0: return result
     if len(result) > count:
         raise Exception("Can't write {} in {} bytes.".format(num, count))
@@ -68,9 +72,9 @@ def intToBytes(num, count=0):
         result = b'\x00' + result
     return result
 
-def intToBytesLE(num, count=0):
-    return bytes(reversed(list(intToBytes(num, count))))
 
+def int_to_bytes_le(num, count=0):
+    return bytes(reversed(list(int_to_bytes(num, count))))
 
 
 def main():

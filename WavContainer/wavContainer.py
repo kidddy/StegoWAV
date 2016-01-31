@@ -6,10 +6,9 @@ from .wavFile import WavFile
 import byte_tools
 
 
-
 class WavContainer(AbstractContainer, WavFile):
-    def __init__(self, filename):
-        WavFile.__init__(self, filename)
+    def __init__(self, file_name):
+        WavFile.__init__(self, file_name)
 
     def container_space(self):
         return (
@@ -19,21 +18,20 @@ class WavContainer(AbstractContainer, WavFile):
         )
 
     def _byte_at_pos(self, pos):
-        return(bytes([self.chunks['data'].data[pos]]))
+        return bytes([self.chunks['data'].data[pos]])
 
     def _set_byte_at_pos(self, byte, pos):
         self.chunks['data'].data[pos] = byte
-
 
     def hide(self, bytes_data):
         if len(bytes_data) > self.container_space():
             raise Exception("Too much data to hide.")
         step = self.chunks['fmt '].bitsPerSample // 8
         pos = -2
-        for bit in byte_tools.toBits(bytes_data):
+        for bit in byte_tools.to_bits(bytes_data):
             pos += step
             self._set_byte_at_pos(
-                byte_tools.hideBit(self._byte_at_pos(pos), bit, 8),
+                byte_tools.hide_bit(self._byte_at_pos(pos), bit, 8),
                 pos
             )
 
@@ -44,10 +42,9 @@ class WavContainer(AbstractContainer, WavFile):
         for i in range(num * 8):
             pos += step
             result.append(
-                byte_tools.toBits(self._byte_at_pos(pos))[7]
+                byte_tools.to_bits(self._byte_at_pos(pos))[7]
             )
-        return byte_tools.toBytes(result)
-
+        return byte_tools.to_bytes(result)
 
 
 def main():

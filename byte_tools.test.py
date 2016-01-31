@@ -7,13 +7,13 @@ class byte_tools_Test(unittest.TestCase):
     def test_toBits(self):
         b = b'\xff\x01'
         res = 0
-        for bit in byte_tools.toBits(b):
+        for bit in byte_tools.to_bits(b):
             res = res * 10 + bit
         self.assertEqual(1111111100000001, res)
 
     def test_toBytes(self):
         first = b'\xff\x01'
-        b = bytes(byte_tools.toBytes(byte_tools.toBits(first)))
+        b = bytes(byte_tools.to_bytes(byte_tools.to_bits(first)))
         self.assertEqual(first, b)
 
     def test_hideBit1(self):
@@ -29,25 +29,25 @@ class byte_tools_Test(unittest.TestCase):
         self.assertEqual(251, b)
 
     def test_bytesToInt(self):
-        self.assertEqual(511, byte_tools.bytesToInt(b'\x01\xff'))
+        self.assertEqual(511, byte_tools.bytes_to_int(b'\x01\xff'))
 
     def test_bytestoIntLE(self):
-        self.assertEqual(511, byte_tools.bytesToIntLE(b'\xff\x01'))
+        self.assertEqual(511, byte_tools.bytes_to_int_le(b'\xff\x01'))
 
     def test_intToBytes1(self):
-        b = byte_tools.intToBytes(20)
+        b = byte_tools.int_to_bytes(20)
         self.assertEqual(b'\x14', b)
 
     def test_intToBytes2(self):
-        b = byte_tools.intToBytes(256)
+        b = byte_tools.int_to_bytes(256)
         self.assertEqual(b'\x01\x00', b)
 
     def test_intToBytes3(self):
-        b = byte_tools.intToBytes(256, 3)
+        b = byte_tools.int_to_bytes(256, 3)
         self.assertEqual(b'\x00\x01\x00', b)
 
     def test_intToBytesLE(self):
-        b = byte_tools.intToBytesLE(256, 3)
+        b = byte_tools.int_to_bytes_le(256, 3)
         self.assertEqual(b'\x00\x01\x00', b)
 
 
