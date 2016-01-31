@@ -3,6 +3,7 @@
 
 from sys import argv
 from os.path import getsize
+import sys
 
 
 class Dumper:
@@ -66,9 +67,7 @@ class Dumper:
         try:
             yield from self._xxd(*args, **kwargs)
         except BrokenPipeError:
-            pass
-        except Exception as e:
-            print(str(e))
+            sys.exit(0)
 
 
 def main():
@@ -78,8 +77,11 @@ def main():
     with open(file_name, mode='rb') as f:
         i = Dumper.file_iterator(f, size)
         xxd = Dumper(shift)
-        for line in xxd(i):
-            print(line)
+        try:
+            for line in xxd(i):
+                print(line)
+        except BrokenPipeError:
+            pass
 
 
 if __name__ == '__main__':

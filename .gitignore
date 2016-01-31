@@ -1,3 +1,4 @@
 *~*
-*.wav
+*wav
 .idea
+*__pycache__*

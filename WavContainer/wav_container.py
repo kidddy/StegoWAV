@@ -2,7 +2,7 @@
 
 
 from abstracts import AbstractContainer
-from .wavFile import WavFile
+from .wav_file import WavFile
 import byte_tools
 
 

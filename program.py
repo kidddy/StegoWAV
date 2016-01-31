@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 
-from WavContainer.wavContainer import WavContainer
+from WavContainer.wav_container import WavContainer
 
 
 class Program:

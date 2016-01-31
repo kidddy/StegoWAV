@@ -37,7 +37,7 @@ class AbstractFile(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def print_info(self):
+    def get_info_text(self):
         """Prints interior info of file."""
         pass
 
