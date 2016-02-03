@@ -53,6 +53,11 @@ class WavFile(AbstractFile):
             for chunk_name in self.chunks:
                 f.write(self.chunks[chunk_name].to_bytes())
 
+    def __getitem__(self, num):
+        #TODO returns sample.
+        pass
+
+
 
 def main():
     pass

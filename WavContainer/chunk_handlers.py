@@ -121,7 +121,7 @@ class DefaultChunk(AbstractChunk):
                 'Size: {}'.format(self.get_size()))
 
     def to_bytes(self):
-        result = bytes(self._name)
+        result = bytes(self._name, "utf-8")
         result += pack("<I", self.get_size())
         result += self._data
         return result
@@ -129,6 +129,7 @@ class DefaultChunk(AbstractChunk):
 
 CHUNK_HANDLERS = dict()
 CHUNK_HANDLERS['fmt '] = ChunkFMT
+CHUNK_HANDLERS['data'] = ChunkDATA
 CHUNK_HANDLERS['def '] = DefaultChunk
 
 
