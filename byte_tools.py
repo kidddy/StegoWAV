@@ -33,48 +33,23 @@ def to_bytes(bits):
     return bytes(result)
 
 
-def hide_bit(byte, hbit, position=8):
-    if not (0 < position < 9):
-        raise Exception("Bad argument position. It should be in [1..8].")
-    result = 0
-    step = 1
-    for bit in to_bits(byte):
-        if step == position:
-            result = result * 2 + hbit
-            step += 1
-            continue
-        result = result * 2 + bit
-        step += 1
-    return result
+def hide_bit(byte, hide_bit, position=1):
+    number_of_byte = 0
+    for i in range(len(byte)):
+        number_of_byte += byte[i] * 256**i
 
+    if hide_bit == 1:
+        number_of_byte |= 2**(position - 1)
+    elif hide_bit == 0:
+        number_of_byte &= 2**(len(byte)*8 + 1) - 1 - 2**(position-1)
+    else:
+        Exception("Bad hide_bit argument.")
 
-def bytes_to_int(byte_str):
-    result = 0
-    for bit in to_bits(byte_str):
-        result = result * 2 + bit
-    return result
-
-
-def bytes_to_int_le(byte_str):
-    return bytes_to_int(reversed(byte_str))
-
-
-def int_to_bytes(num, count=0):
-    n = bin(num)[2:]
-    b = []
-    for e in n:
-        b.append(int(e))
-    result = to_bytes(b)
-    if count == 0: return result
-    if len(result) > count:
-        raise Exception("Can't write {} in {} bytes.".format(num, count))
-    while len(result) != count:
-        result = b'\x00' + result
-    return result
-
-
-def int_to_bytes_le(num, count=0):
-    return bytes(reversed(list(int_to_bytes(num, count))))
+    result = list()
+    while number_of_byte != 0:
+        result.append(number_of_byte % 256)
+        number_of_byte //= 256
+    return bytes(result).ljust(len(byte), b'\x00')
 
 
 def main():

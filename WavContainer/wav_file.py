@@ -54,9 +54,15 @@ class WavFile(AbstractFile):
                 f.write(self.chunks[chunk_name].to_bytes())
 
     def __getitem__(self, num):
-        #TODO returns sample.
-        pass
+        sample_size = self.chunks["fmt "].bits_per_sample // 8
+        return self.chunks["data"].data[num * sample_size:(num + 1)*sample_size]
 
+    def __setitem__(self, num, sample):
+        sample_size = self.chunks["fmt "].bits_per_sample // 8
+        if len(sample) != sample_size:
+            raise Exception("Sample setter size error.")
+        for i in range(sample_size):
+            self.chunks["data"].data[num * sample_size + i] = sample[i]
 
 
 def main():

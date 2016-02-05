@@ -10,30 +10,25 @@ class WavContainer(AbstractContainer, WavFile):
     def __init__(self, file_name):
         WavFile.__init__(self, file_name)
 
-    def container_space(self):
+    def container_space(self, number_of_bad_bits=1):
+        if not 0 < number_of_bad_bits < 9:
+            raise Exception("Bad number of bad bits")
         return (
             self.chunks['data'].get_size() //
-            self.chunks['fmt '].blockAlign //
-            8
+            self.chunks['fmt '].bits_per_sample //
+            8 * number_of_bad_bits
         )
 
-    def _byte_at_pos(self, pos):
-        return bytes([self.chunks['data'].data[pos]])
-
-    def _set_byte_at_pos(self, byte, pos):
-        self.chunks['data'].data[pos] = byte
-
-    def hide(self, bytes_data):
-        if len(bytes_data) > self.container_space():
-            raise Exception("Too much data to hide.")
-        step = self.chunks['fmt '].bitsPerSample // 8
-        pos = -2
-        for bit in byte_tools.to_bits(bytes_data):
-            pos += step
-            self._set_byte_at_pos(
-                byte_tools.hide_bit(self._byte_at_pos(pos), bit, 8),
-                pos
+    def hide(self, bytes_data, number_of_bad_bits=1):
+        if len(bytes_data) > self.container_space(number_of_bad_bits):
+            raise Exception("Too much data to hide. {}: but max={}".format(
+                len(bytes_data), self.container_space())
             )
+        pos = 0
+        for bit in byte_tools.to_bits(bytes_data):
+            self[pos] = bytes(byte_tools.hide_bit(self[pos], bit, position=1))
+            pos += 1
+            # TODO: number_of_bad_bits and reveal
 
     def reveal(self, num):
         result = []

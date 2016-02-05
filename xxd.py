@@ -32,7 +32,7 @@ class Dumper:
     def file_iterator(f, size):
         def result():
             for _ in range(size):
-                yield f.read(1)
+                yield f.read(1)[0]
         return result()
 
     def _xxd(self, byte_sequence):
@@ -40,11 +40,6 @@ class Dumper:
         num = 0
         endian = ""
         for byte in byte_sequence:
-            if not isinstance(byte, int):
-                if isinstance(byte, bytes):
-                    byte = byte[0]
-                else:
-                    raise Exception("Unexpected type: {}".format(type(byte)))
             if 31 < byte < 127:
                 endian += chr(byte)
             else:

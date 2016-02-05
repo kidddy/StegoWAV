@@ -91,10 +91,10 @@ class ChunkFMT(AbstractChunk):
 
 class ChunkDATA(AbstractChunk):
     def __init__(self, f, size):
-        self._data = bytearray(f.read(size))
+        self.data = bytearray(f.read(size))
 
     def get_size(self):
-        return len(self._data)
+        return len(self.data)
 
     def get_info_text(self):
         result = ('Chunk ID: data\n' +
@@ -104,7 +104,7 @@ class ChunkDATA(AbstractChunk):
     def to_bytes(self):
         result = b'data'
         result += pack("<I", self.get_size())
-        result += self._data
+        result += self.data
         return result
 
 
