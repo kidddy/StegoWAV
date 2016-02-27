@@ -33,23 +33,29 @@ def to_bytes(bits):
     return bytes(result)
 
 
-def hide_bit(byte, hide_bit, position=1):
-    number_of_byte = 0
-    for i in range(len(byte)):
-        number_of_byte += byte[i] * 256**i
+def invert(x, bin_num_length=None):
+    bin_x = []
+    while x != 0:
+        bin_x.append(x % 2)
+        x //= 2
+    while not (bin_num_length is None or bin_num_length <= len(bin_x)):
+        bin_x.append(0)
+    res = 0
+    for e in reversed(bin_x):
+        res = res*2 + int(not e)
+    return res
 
-    if hide_bit == 1:
-        number_of_byte |= 2**(position - 1)
-    elif hide_bit == 0:
-        number_of_byte &= 2**(len(byte)*8 + 1) - 1 - 2**(position-1)
-    else:
-        Exception("Bad hide_bit argument.")
 
-    result = list()
-    while number_of_byte != 0:
-        result.append(number_of_byte % 256)
-        number_of_byte //= 256
-    return bytes(result).ljust(len(byte), b'\x00')
+def hide_data(byte, data, bin_data_size=None):
+    if bin_data_size is None:
+        bin_data_size = len(bin(data)[2:])
+    bin_byte_size = len(bin(byte)[2:])
+    ones = invert(0, bin_data_size)
+    byte |= ones
+    ones = invert(0, bin_byte_size) - invert(0, bin_data_size)
+    data |= ones
+
+    return byte & data
 
 
 def main():

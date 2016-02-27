@@ -29,12 +29,12 @@ class Enumerator:
             num = self.get_size() - self._pos
         step = 0
         result = []
-        try:
-            while step != num:
+        while step != num:
+            try:
                 result.append(next(self._iter))
                 step += 1
-        except StopIteration:
-            pass
+            except StopIteration:
+                break
         self._pos += num
         return result
 

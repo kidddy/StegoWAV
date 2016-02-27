@@ -7,7 +7,7 @@ import sys
 
 def go(container, file_name):
     with open(file_name, mode="rb") as f:
-        container.hide(f.read())
+        container.hide(f.read(), number_of_bad_bits=2)
 
 
 def main():
