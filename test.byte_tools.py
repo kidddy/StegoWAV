@@ -46,6 +46,19 @@ class ByteToolsTest(unittest.TestCase):
         b = byte_tools.hide_data(42, 2, 4)
         self.assertEqual(34, b)
 
+    def test_reveal(self):
+        byte = 234213
+        hidden_data = 9
+        number_of_bad_bits = 15
+        bad_byte = byte_tools.hide_data(byte, hidden_data, number_of_bad_bits)
+        released_data = byte_tools.reveal_data(bad_byte, number_of_bad_bits)
+        self.assertEqual(hidden_data, released_data)
+
+    def test_byte_to_int_and_back(self):
+        b = b'abcd'
+        n = byte_tools.bytes_to_int(b)
+        self.assertEqual(b, byte_tools.int_to_bytes(n))
+
 
 def main():
     unittest.main()

@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 from abc import ABCMeta, abstractmethod
 from struct import pack, unpack
 
@@ -20,6 +18,11 @@ class AbstractChunk(metaclass=ABCMeta):
     @abstractmethod
     def to_bytes(self):
         raise NotImplementedError("Need to rewrite method")
+
+
+class BadChunkException(Exception):
+    def __init__(self, *args, **kwargs):
+        pass
 
 
 class ChunkFMT(AbstractChunk):

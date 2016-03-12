@@ -1,9 +1,9 @@
-#!\usr\bin\python3
-
 from .chunk_handlers import CHUNK_HANDLERS
 from abstracts import AbstractFile
 from collections import OrderedDict
 from struct import pack, unpack
+from .chunk_handlers import BadChunkException
+import byte_tools
 
 
 class WavFile(AbstractFile):
@@ -12,10 +12,10 @@ class WavFile(AbstractFile):
         self.chunks = OrderedDict()
         with open(self._name, mode='rb') as f:
             if f.read(4).decode('utf-8') != 'RIFF':
-                raise Exception("Bad file: not RIFF")
+                raise BadFileException("not RIFF")
             size = unpack("<I", f.read(4))[0]
             if f.read(4).decode('utf-8') != 'WAVE':
-                raise Exception("Bad file: not WAVE")
+                raise BadFileException("Bad file: not WAVE")
             self._read_chunks(f, size - 4)
 
     def _read_chunks(self, f, size):
@@ -24,7 +24,7 @@ class WavFile(AbstractFile):
             chunk_name = f.read(4).decode('utf-8')
             chunk_size = unpack("<I", f.read(4))[0]
             if chunk_size == 0:
-                raise Exception('Null chunk')
+                raise BadChunkException('Null chunk')
             if chunk_name not in CHUNK_HANDLERS:
                 self.chunks[chunk_name] = CHUNK_HANDLERS["def "](f, chunk_size, chunk_name)
                 pos += chunk_size + 8
@@ -54,15 +54,21 @@ class WavFile(AbstractFile):
                 f.write(self.chunks[chunk_name].to_bytes())
 
     def __getitem__(self, num):
-        sample_size = self.chunks["fmt "].bits_per_sample // 8
-        return self.chunks["data"].data[num * sample_size:(num + 1)*sample_size]
+        sample_size = self.chunks["fmt "].block_align // self.chunks["fmt "].num_channels
+        return byte_tools.bytes_to_int(self.chunks["data"].data[num * sample_size: (num + 1)*sample_size])
 
     def __setitem__(self, num, sample):
-        sample_size = self.chunks["fmt "].bits_per_sample // 8
+        sample_size = self.chunks["fmt "].block_align // self.chunks["fmt "].num_channels
+        sample = byte_tools.int_to_bytes(sample, sample_size)
         if len(sample) != sample_size:
-            raise Exception("Sample setter size error.")
+            raise ValueError("Sample setter size error.")
         for i in range(sample_size):
             self.chunks["data"].data[num * sample_size + i] = sample[i]
+
+
+class BadFileException(Exception):
+    def __init__(self, *args, **kwargs):
+        pass
 
 
 def main():

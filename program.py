@@ -1,65 +1,95 @@
 #!/usr/bin/python3
 
 
-from WavContainer.wav_container import WavContainer
+from wav_tools.wav_container import WavContainer
+from argparse import ArgumentParser
+from xxd import Dumper
+from sys import argv, exit
+
+
+def init_argparser():
+    parser = ArgumentParser(prog="python3 program.py", epilog="by kidddy!")
+    sub_parsers = parser.add_subparsers(help="modes of program")
+
+    hide_parser = sub_parsers.add_parser('hide', help="Hides datafile in the file-container")
+    hide_parser.add_argument('file-container', action="store", help="This is file-container name")
+    hide_parser.add_argument('data_file', action='store', help="This is datafile name")
+    hide_parser.add_argument('output_file', action='store', help="Name of a output file.")
+
+    reveal_parser = sub_parsers.add_parser('reveal', help="Reveals hidden data from the file-container")
+    reveal_parser.add_argument('file-container', action="store", help="This is file-container name")
+    reveal_parser.add_argument('output_file', action='store', help="Name of a output file.")
+
+    check_parser = sub_parsers.add_parser('check', help="Steganalysis")
+    check_parser.add_argument('file-container', action="store", help="This is file-container name")
+    check_parser.add_argument('--hex_table', action="store_true", help="Prints hex table of hidden data.")
+
+    parser.add_argument(
+        '-b', '--bad_bits_number',
+        action="store",
+        default=1,
+        type=int,
+        help="Number of how many bits in every byte will be replaced")
+    parser.add_argument(
+        '-o', '--ordering_type',
+        action="store",
+        default=0,
+        type=int,
+        help="Thing which will be used for ordering bytes")
+    return parser
 
 
 class Program:
+    def __init__(self, source_filename):
+        self._container = WavContainer(source_filename)
 
-    mode = dict()
-    mode['default'] = 0
-    mode['--hide'] = 1
-    mode['--reveal'] = 2
-    mode['--help'] = 3
+    def hide(self, data, output_file, bad_bits_num=1, order_num=0):
+        with open(data, mode='rb') as f:
+            bin_data = f.read()
+        self._container.hide(bin_data, order_num, bad_bits_num)
+        self._container.save_to_disk(output_file)
 
-    def __init__(self, args):
-        self._mode = Program.mode['default']
-        if args[0] not in Program.mode:
-            print('Arguments error: bad mode.')
-        self._mode = Program.mode[args[0]]
-        self._args = args[1:]
+    def reveal(self, output_file, bad_bits_num=1, order_num=0):
+        with open(output_file, mode="wb") as f:
+            f.write(bytes(self._container.reveal(order_num, bad_bits_num)))
 
-    def work(self):
-        if self._mode == Program.mode['--hide']:
-            self._hide()
-        elif self._mode == Program.mode['--reveal']:
-            self._reveal()
-        elif self._mode == Program.mode['--help']:
-            self.print_help()
-        elif self._mode == Program.mode['default']:
+    def dump_hidden_data(self, bad_bits_num=1, order_num=0):
+        try:
+            dumper = Dumper()
+            for line in dumper(self._container.reveal(order_num, bad_bits_num)):
+                print(line)
+        except BrokenPipeError:
             pass
-        else:
-            raise Exception("Unknown mode.")
-
-    def _hide(self):
-        if len(self._args) < 3:
-            print("Arguments error.")
-        (input_file, hide_data, output_file) = self._args
-        with open(hide_data, 'rb') as f:
-            data = f.read()
-        w = WavContainer(input_file)
-        w.hide(data)
-        w.save_to_disk(output_file)
-        print("Done!")
-
-    def _reveal(self):
-        if len(self._args) < 3:
-            print("Arguments error.")
-        (container, num_bytes, output_file) = self._args
-        w = WavContainer(container)
-        data = w.reveal(int(num_bytes))
-        with open(output_file, 'wb') as f:
-            f.write(data)
-        print("Done")
-
-    @staticmethod
-    def print_help():
-        print("HELP INFO.")
 
 
 def main():
-    pass
-
+    parser = init_argparser()
+    args = vars(parser.parse_args(argv[1:]))
+    program = Program(args['file-container'])
+    if 'data_file' in args:  # HIDE
+        program.hide(
+            args['data_file'],
+            args['output_file'],
+            args['bad_bits_number'],
+            args['ordering_type']
+        )
+    elif 'output_file' in args:  # REVEAL
+        program.reveal(
+            args['output_file'],
+            args['bad_bits_number'],
+            args['ordering_type']
+        )
+    else:  # CHECK
+        if args['hex_table']:
+            program.dump_hidden_data(
+                args['bad_bits_number'],
+                args['ordering_type']
+            )
+        else:
+            print(program._container.get_info_text())
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(e)

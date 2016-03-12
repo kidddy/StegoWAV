@@ -1,6 +1,3 @@
-#!/usr/bin/python3
-
-
 def to_bits(byte_str):
     result = []
     for byte in byte_str:
@@ -46,16 +43,32 @@ def invert(x, bin_num_length=None):
     return res
 
 
-def hide_data(byte, data, bin_data_size=None):
-    if bin_data_size is None:
-        bin_data_size = len(bin(data)[2:])
-    bin_byte_size = len(bin(byte)[2:])
-    ones = invert(0, bin_data_size)
-    byte |= ones
-    ones = invert(0, bin_byte_size) - invert(0, bin_data_size)
-    data |= ones
+def bytes_to_int(byte_line):
+    result = 0
+    for byte in reversed(byte_line):
+        result = result*256 + byte
+    return result
 
-    return byte & data
+
+def int_to_bytes(num, bytes_len):
+    result = []
+    while num != 0:
+        result.append(num % 256)
+        num //= 256
+    return bytes(reversed(bytes(reversed(result)).rjust(bytes_len, b'\00')))
+
+
+def hide_data(byte, data_to_hide, bad_bits_num=None):
+    if bad_bits_num is None:
+        bad_bits_num = len(bin(data_to_hide)[2:])
+    byte = bin(byte)[2:].rjust(8, '0')[:-bad_bits_num]
+    data_to_hide = bin(data_to_hide)[2:].rjust(bad_bits_num, '0')
+    return int(byte + data_to_hide, 2)
+
+
+def reveal_data(byte, number_of_bad_bits):
+    ones = invert(0, number_of_bad_bits)
+    return byte & ones
 
 
 def main():

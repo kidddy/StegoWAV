@@ -1,6 +1,3 @@
-#!/usr/bin/python3
-
-
 from abc import ABCMeta, abstractmethod
 
 
@@ -16,7 +13,7 @@ class AbstractContainer(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def hide(self, bytes_data):
+    def hide(self, bin_data, order_inspector, bad_bits_num=1):
         """Hides data in himself."""
         pass
 
